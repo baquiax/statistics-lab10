@@ -1,0 +1,354 @@
+---
+title: 'Laboratorio #10'
+output:
+  html_document: default
+  html_notebook: default
+---
+
+- _Estadística Matemática_
+- Alexander Baquiax. _12007988_
+- Código fuente: [/baquiax/statics-lab10](https://github.com/baquiax/statistics-lab10)
+
+
+**Universidad Galileo**
+
+
+---
+1. Una compañía que manufactura y embotella jugo de manzana usa una maquina que automáticamente llena botellas de 16 onzas. Hay alguna variación, no obstante, en las cantidades de líquido que se ponen en las botellas que se llenan. Se ha observado que la cantidad de líquido está normalmente distribuido en forma aproximada con media de 16 onzas y desviación estándar de 1 onza.
+
+    a. _Una compañía que manufactura y embotella jugo de manzana usa una maquina que automáticamente llena botellas de 16 onzas. Hay alguna variación, no obstante, en las cantidades de líquido que se ponen en las botellas que se llenan. Se ha observado que la cantidad de líquido está normalmente distribuido en forma aproximada con media de 16 onzas y desviación estándar de 1 onza._
+
+    #### **Respuesta:**
+    Tenemos que la distribución es **normal** con \(\mu\) = 16 onz y **\(\sigma\)** = 1 onza
+    
+    Para encontrar `z` es necesario calcular \(z = \frac{x-\mu}{\sigma} \)
+          
+        z = `r (17.00-16.00)/1.00`
+        
+    Debemos buscar dentro de la tabla z, el valor para `z = 1.00`, esto es igual a: `0.1583`.
+
+    b. _Determine la proporción de botellas que tendrán de 14 a 16 onzas._
+    
+    #### **Respuesta:**
+    ```{r}
+    fnormal <- function(x) {
+      dnorm(x=x, mean=15, sd=1)
+    }
+    
+    integrate(fnormal, lower=12, upper=14)
+    ```
+    
+    c. _Muestre una gráfica de dicha distribución._
+    
+    #### **Respuesta:**
+    ```{r}
+    xs <- sort(rnorm(500, 16,1))
+    normal<-dnorm(xs, 16,  1)
+    plot(xs, normal, main="PDF", xlab="X", ylab="Densidad", lwd="2", type='l')
+    ```
+    
+2. Para verificar la exactitud de sus estados financieros, las empresas a menudo emplean auditores que verifiquen sus ingresos. Los empleados de la empresa se equivocan al registrar los ingresos el 5% de las veces. Suponga que un auditor revisa aleatoriamente tres ingresos:
+
+    a. Para verificar la exactitud de sus estados financieros, las empresas a menudo emplean auditores que verifiquen sus ingresos. Los empleados de la empresa se equivocan al registrar los ingresos el 5% de las veces. Suponga que un auditor revisa aleatoriamente tres ingresos:
+    
+    #### **Respuesta:**
+    Este es un ejemplo de la distrubición **binomial**. Donde los éxitos serán: _encontrar un error_ y los facasos _NO hacerlo_.
+    
+    Se tiene también que `p = 0.05`, por lo tanto `q = 0.95`
+    
+    | x | P(x) |
+    |---|------|
+    |0|`r 0.95^3`|
+    |1|`r 0.05*(0.95)^2`|
+    |2|`r (0.05^2)*0.95`|
+    |3|`r 0.05^3`|
+    
+    Esto porque al ser idependientes el producto de las mismas representa la probabilidad de que todas pasen.
+    
+    b. construya un histograma de probabilidades para p(x).
+    
+    #### **Respuesta:**  
+    ```{r}
+      data<-c(0.95^3,0.05*(0.95)^2,(0.05^2)*0.95,0.05^3)
+      barplot(data, col = 'red', xlab = 'Errores', ylab = 'P(x)', names.arg = c(0,1,2,3))
+    ```
+    
+    c. Encuentre la probabilidad de que un auditor detecte más de un error: \(p(x \geq 1)) = 1 - p(x \lt 1) = 1 - p(0)\) 
+    
+    #### **Respuesta:**
+    ```{r}
+    1 - 0.95^3
+    ```
+
+
+3. El número de nudos en un tipo particular de madera tiene una distribución de Poisson con un promedio de 1.5 nudos en 10 pies cúbicos de madera.
+
+    a. Encuentre la probabilidad de que un bloque de 10 piescúbicos de madera tenga al menos un 1 nudo.
+    
+    #### **Respuesta:**
+    Recordar: \(p(x)=\frac{\lambda^2 e^-\lambda}{x!} \), con \(\lambda = 1.5\)
+    
+    
+    \(p(x \geq 1) = 1 - p(0)\) = `r 1 - ((1.5)^0)*exp(-1.5)`
+    
+    b. Dibuje la PDF para esta distribución.
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rpois(1000, 1.5))
+    pdf<-dpois(x, lambda = 1.5)
+    plot(x,pdf, type = 'l', xlab = 'x', ylab = 'p(x)')
+    ```
+    
+    c.  Dibuje la CDF para esta distribución.
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rpois(1000, 1.5))
+    cdf<-ppois(x, lambda = 1.5)
+    plot(x, cdf, type = 'l', xlab = 'x', ylab = 'p(x)')
+    ```
+
+4. Se descubrió que a determinada concentración una sustancia química, encontrada en aguas contaminadas, resultó mortal para 20% de los peces que se exponían a ella por más de 24 horas. Se colocan 20 peces en un tanque de agua que contiene esa concentración del químico.
+
+    a. Encuentre la probabilidad de que sobrevivan 14 peces
+    
+    #### **Respuesta:**
+    _Probabilidad binomial_ con \(p=0.8\) y \(q=0.2\)
+    
+    ```{r}
+    choose(20,14) * (0.8)^14 * (0.2)^6
+    ```
+    
+    b. Calcula la probabilidad de que por lo menos 10 sobrevivan
+    
+    #### **Respuesta:**
+    \(p(x \geq 10) = 1 - p(9) - p(8) ... - p(0)) \)
+    ```{r}
+    p = 0
+    for(i in seq(0,9)) {
+      p <- p + choose(20,i) * (0.8)^i * (0.2)^(20-i)
+    }
+    1 - p
+    ```
+    
+    c. Encuentre qué probabilidad existe de que sobrevivan cuando mucho 16 peces.
+    
+    #### **Respuesta:**
+    \(p(x \leq 16) = p(16) + p(15) ... + p(0) \)
+    
+    ```{r}
+    p = 0
+    for(i in seq(0,9)) {
+      p <- p + choose(20,i) * (0.8)^i * (0.2)^(20-i)
+    }
+    p
+    ```
+    
+    d. Obtenga la media y la varianza de la cantidad de sobrevivientes.
+    
+    #### **Respuesta:**
+    
+    **Media**
+    \(\mu = np\) , eso es `r 0.8 * 20`
+    
+    **Varianza**
+    \(var = npq\) , eso es `r 0.8 * 0.2 * 20`
+    
+    e. Realice una gráfica de la PDF
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rbinom(100,20,0.8))
+    pdf=dbinom(x,20,0.8)
+    plot(x, pdf, type = 'l')
+    ```
+    
+    f. Realice una gráfica de la CDF
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rbinom(100,20,0.8))
+    cdf=pbinom(x,20,0.8)
+    plot(x, cdf, type = 'l')
+    ```
+    
+5. Un explorador de petróleo hará una serie de perforaciones en determinada área para localizar un pozo productivo. La probabilidad de que tenga éxito en un ensayo es de 0.2
+
+    a. ¿Cuál es la probabilidad de que la tercera perforación sea la primera en dar un pozo productivo?
+    
+    #### **Respuesta:**
+    _Distribucion Geometrica_ con \(p=0.2\) y \(q=0.8\)
+    
+    \(p(x=3) = q^(x-1) * p\) eso significa \(p(x=3)\) = `r 0.2^(3-1) * 0.8`
+    
+    
+    b. Si la empresa puede darse el lujo de perforar a lo sumo diez pozos, ¿Cuál es la probabilidad de que no encuentre un pozo productivo?
+    
+    #### **Respuesta:**
+    \(p(x \leq 10) = 1 - p(1) - p(2) ... - p(10)\)
+    
+    ```{r}
+    p = 0
+    for(i in seq(1,10)) {
+      p <- p + 0.2^(i-1) * 0.8
+    }
+    1 - p
+    ```
+    
+    c. ¿Cuántas perforaciones esperaría hacer la empresa?
+    
+    #### **Respuesta:**
+    \(E(x) = p^-1\) eso implica, `r 1/0.2`
+    
+    d. Realice una gráfica de la PDF.
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rgeom(100,0.2))
+    pdf=dgeom(x, 0.2)
+    plot(x, pdf, type = 'l')
+    ```
+    
+    e. Realice una gráfica de la CDF.
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-sort(rgeom(100,0.2))
+    cdf=pgeom(x, 0.2)
+    plot(x, cdf, type = 'l')
+    ```
+    
+6. Suponga que Y tiene una función de densidad \(f(y) = \begin{cases} ky(1-y), 0 \leq y \leq 1 \\ 0, e.o.p\end{cases}\)
+
+    a. Encuentre el valor de k que convierte a f(y) en una función de densidad de probabilidad.
+    
+    #### **Respuesta:**
+    \(k\int_{0}^{1} y(1-y) dy = 1\)
+    
+    ```{r}
+    pdf<-function(y) {
+      y*(1-y)
+    }
+    k<-1/(integrate(pdf, 0, 1)$value)
+    k
+    ```
+    
+    Con ello tenemos ahora completamente definido la pdf:
+    
+    \(f(y) = \begin{cases} 6y(1-y), 0 \leq y \leq 1 \\ 0, e.o.p\end{cases}\)
+    
+    b. Encuentre \(p(0.4 \leq Y \leq 1)\)
+    
+    #### **Respuesta:**
+    ```{r}
+    pdf<-function(y) {
+      6*y*(1-y)
+    }
+    
+    p<-(integrate(pdf, 0.4, 1)$value)
+    p
+    ```
+    
+    c. Encuentre \(p(0.4 \leq Y \lt 1)\)
+    
+    #### **Respuesta:**
+    ```{r}
+    p<-(integrate(pdf, 0.4, 1)$value)
+    p
+    ```
+    
+    d. Encuentre \(p(Y \leq 0.4 | Y \leq 0.8)\)
+    
+    #### **Respuesta:**
+    ```{r}
+    p<-(integrate(pdf, 0, 0.4)$value) / (integrate(pdf, 0, 0.8)$value)
+    p
+    ```
+    
+    d. Encuentre \(p(Y \lt 0.4 | Y \lt 0.8)\)
+    
+    #### **Respuesta:**
+    ```{r}
+    p<-(integrate(pdf, 0, 0.4)$value) / (integrate(pdf, 0, 0.8)$value)
+    p
+    ```
+    
+    f. Realice una gráfica de la CDF.
+    
+    #### **Respuesta:**
+    ```{r}
+    x<-seq(0, 10)
+    plot(x, lapply(x, pdf) , type='l', xlab = 'x', ylab = 'p(x)')
+    ```
+    
+7. Se observó que la cantidad semanal de dinero gastado por una compañía durante largo tiempo en mantenimiento y reparaciones, está normalmente distribuida en forma apropiada con media de \$400 y desviación estándar de \$20. Si están presupuestados $450 para la próxima semana. ¿Cuál es la probabilidad de que los costos reales rebasen la cantidad presupuestada? Además muestre una gráfica de la PDF y de la CDF para esta distribución.
+
+#### **Respuesta:**
+
+_Distribucion Normal_. \(\mu=400\) y \(\sigma=20\)
+
+\(p(x \lt 450) = \int_{450}^{\infty} \frac{e^\frac{-(x-\mu)^2}{2*\sigma^2}}{20\sqrt{2*\pi}}\)
+
+
+```{r}
+pdf<-function(x){
+  exp((-(x-400)^2/(2*(20)^2)))/(20*sqrt(2*pi))
+}
+integrate(pdf, 450, Inf)$value
+```
+
+#### PDF
+```{r}
+x<-sort(rnorm(600, 400,20))
+pdf<-dnorm(x,mean=400,sd=20)
+plot(x, pdf, xlab = 'x', ylab = 'p(x)', type = 'l')
+```
+
+#### CDF
+```{r}
+cdf<-pnorm(x,mean=400,sd=20)
+plot(x, cdf, xlab = 'x', ylab = 'p(x)', type = 'l')
+```
+
+8. La magnitud de temblores registrados en una región de América del Norte puede modelarse como si tuviera una distribución exponencial con media 2.4, según se mide en la escala de Richter.
+
+    _Dist. exponencial_ con \(\lambda=2.4\)
+  
+    \(p(x)=\lambda e^{-\lambda x}\)
+
+    a. Encuentre la probabilidad de que un temblor que ocurra en esta región sea mayor que 3.0 en la escalada de Richter.
+    
+    #### **Respuesta**
+    \(p(x \lt 3) = 1 - (1 - e^{-\lambda x})\)
+  
+    ```{r}
+    exp(-2.4 * 3)
+    ```
+  
+    b. Encuentre la probabilidad de que un temblor que ocurra en esta región este en el rango de 2.0 y 3.0 en la escalada de Richter
+    
+    #### **Respuesta**
+    \(p(2 \leq x \leq 3) = (1 - (1 - e^{-\lambda 3})) - (1 - (1 - e^{-\lambda 2}))\)
+  
+    ```{r}
+    (1 - exp(-2.4 * 3)) - (1 - exp(-2.4 * 2))
+    ```
+    
+    c. Muestre una grafica de la PDF.
+    
+    #### **Respuesta**
+    ```{r}
+    x<-sort(rexp(100, 2.4))
+    pdf<-dexp(x, 2.4)
+    plot(x, pdf, xlab = 'x', ylab = 'p(x)', type = 'l')
+    ```
+    
+    d. Muestre una grafica de la CDF.
+    
+    #### **Respuesta**
+    ```{r}
+    x<-sort(rexp(100, 2.4))
+    cdf<-pexp(x, 2.4)
+    plot(x, cdf, xlab = 'x', ylab = 'p(x)', type = 'l')
+    ```
